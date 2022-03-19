@@ -34,15 +34,21 @@ TeamSpeak.connect({
             'info', // A Usage Info with arguments
             'Prints Informations', // A Description what the command does
             async (command, [...args], scope) => {
-                return [...(await teamspeak.clientList({ clientType: 0 })).map(e => {
-                    console.log(e.platform, e.servergroups);
-                    return ['Name: ' + e.nickname,
+                const clients = await teamspeak.clientList({ clientType: 0 });
+                return (await Promise.all(clients.map(async e => {
+                    const servergroups = await Promise.all(e.servergroups.map(async id => {
+                        const group = await teamspeak.getServerGroupById(id);
+                        return group.propcache.name;
+                    }));
+                    const output = ['Name: ' + e.nickname,
                     '  IP: ' + e.connectionClientIp,
                     '  UID: ' + e.uniqueIdentifier,
                     '  Country: ' + e.country,
-                    '  First Join: ' + new Date(e.created * 1000).toLocaleString()
+                    '  Platform: ' + e.platform,
+                    '  Server-Gruppen: ' + servergroups.join(', ')
                     ]
-                }).flat()];
+                    return output;
+                }))).flat();
             }
         )
     );
