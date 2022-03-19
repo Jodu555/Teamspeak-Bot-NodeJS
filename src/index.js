@@ -36,6 +36,18 @@ TeamSpeak.connect({
             })
     }
 
+    const bannerStuff = ['[cspacer]» Jodu555.de «', '[cspacer]» Editfusee.de «']
+    let bannerIDX = 0;
+    const changeBanner = async () => {
+        if (bannerIDX == bannerStuff.length)
+            bannerIDX = 0;
+        channel = await teamspeak.getChannelById('5');
+        channel.edit({
+            channelName: bannerStuff[bannerIDX],
+        })
+        bannerIDX++;
+    }
+
     const clients = await teamspeak.clientList({ clientType: 0 });
     clients.forEach(client => {
         console.log('Online:', client.nickname);
@@ -63,9 +75,15 @@ TeamSpeak.connect({
     });
 
 
-    (await teamspeak.getClientByName('Jodu555')).message('Hello There!')
+    // (await teamspeak.getClientByName('Jodu555')).message('Hello There!')
 
     editOnlineChannels();
+
+    changeBanner();
+
+    const bannerChanger = setInterval(changeBanner, 1000 * 60 * 5) // Every 5 minutes
+
+
 
 
 }).catch(e => {
