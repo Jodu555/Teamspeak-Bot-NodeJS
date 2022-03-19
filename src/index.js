@@ -22,14 +22,18 @@ TeamSpeak.connect({
         const clients = await teamspeak.clientList({ clientType: 0 });
         const teamMembers = clients.filter(c => !c.servergroups.includes(noTeamGroups));
         let channel = await teamspeak.getChannelById('33');
-        channel.edit({
-            channelName: `[cspacer]Derzeit ${clients.length == 1 ? 'ist' : 'sind'} ${clients.length} Spieler Online`,
-        })
+        let text = `[cspacer]Derzeit ${clients.length == 1 ? 'ist' : 'sind'} ${clients.length} Spieler Online`
+        if (channel.name !== text)
+            channel.edit({
+                channelName: text,
+            })
 
         channel = await teamspeak.getChannelById('34');
-        channel.edit({
-            channelName: `[cspacer]Davon ${clients.length == 1 ? 'ist' : 'sind'} ${teamMembers.length} im Team`,
-        })
+        text = `[cspacer]Davon ${clients.length == 1 ? 'ist' : 'sind'} ${teamMembers.length} im Team`;
+        if (channel.name !== text)
+            channel.edit({
+                channelName: text,
+            })
     }
 
     const clients = await teamspeak.clientList({ clientType: 0 });
@@ -52,6 +56,7 @@ TeamSpeak.connect({
     });
 
     teamspeak.on('textmessage', async ({ invoker: inv, msg, targetmode }) => {
+        console.log('Happend');
         if (checkIfSelf(inv.propcache)) {
             const invoker = await teamspeak.getClientByUid(inv.propcache.clientUniqueIdentifier);
         }
