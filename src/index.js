@@ -5,13 +5,13 @@ const noTeamGroups = ['10', '17', '16', '15', '11']
 
 //create a new connection
 TeamSpeak.connect({
-    host: "rooti.jodu555.de",
+    host: process.env.QUERY_HOST,
     protocol: QueryProtocol.RAW, //optional
     queryport: 10011, //optional
     serverport: 9987,
-    username: "serveradmin",
+    username: process.env.QUERY_USERNAME,
     password: process.env.QUERY_PASSWORD,
-    nickname: "NodeJS-BOT"
+    nickname: process.env.QUERY_NICKNAME
 }).then(async teamspeak => {
     const checkIfSelf = (cl) => {
         return !(cl.clientNickname.includes('BOT')
@@ -81,7 +81,7 @@ TeamSpeak.connect({
 
     changeBanner();
 
-    const bannerChanger = setInterval(changeBanner, 1000 * 60 * 5) // Every 5 minutes
+    // const bannerChanger = setInterval(changeBanner, 1000 * 60 * 5) // Every 5 minutes
 
 
 
