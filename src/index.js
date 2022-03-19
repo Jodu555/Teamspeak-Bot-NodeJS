@@ -13,6 +13,11 @@ TeamSpeak.connect({
     password: process.env.QUERY_PASSWORD,
     nickname: "NodeJS-BOT"
 }).then(async teamspeak => {
+    const checkIfSelf = (cl) => {
+        return !(cl.clientNickname.includes('BOT')
+            || cl.clientVersion.includes('ServerQuery')
+            || cl.clientUniqueIdentifier.includes('clientUniqueIdentifier'));
+    }
     const editOnlineChannels = async () => {
         const clients = await teamspeak.clientList({ clientType: 0 });
         const teamMembers = clients.filter(c => !c.servergroups.includes(noTeamGroups));
@@ -30,11 +35,15 @@ TeamSpeak.connect({
     const clients = await teamspeak.clientList({ clientType: 0 });
     clients.forEach(client => {
         console.log('Online:', client.nickname);
+
     })
 
 
 
-    teamspeak.on('clientconnect', () => {
+    teamspeak.on('clientconnect', async (cl) => {
+        const client = await teamspeak.getClientByUid(cl.client.propcache.clientUniqueIdentifier);
+        if (client.nickname == 'Jodu555')
+            client.message('Im Here!');
         editOnlineChannels();
     });
 
@@ -42,6 +51,14 @@ TeamSpeak.connect({
         editOnlineChannels();
     });
 
+    teamspeak.on('textmessage', async ({ invoker: inv, msg, targetmode }) => {
+        if (checkIfSelf(inv.propcache)) {
+            const invoker = await teamspeak.getClientByUid(inv.propcache.clientUniqueIdentifier);
+        }
+    });
+
+
+    (await teamspeak.getClientByName('Jodu555')).message('Hello There!')
 
     editOnlineChannels();
 
