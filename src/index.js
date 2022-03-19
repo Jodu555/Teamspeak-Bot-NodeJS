@@ -1,4 +1,7 @@
 require('dotenv').config();
+const { CommandManager, Command } = require('@jodu555/commandmanager');
+//                                              Pass here the standard pipe you want to use
+const commandManager = CommandManager.createCommandManager(process.stdin, process.stdout);
 const { TeamSpeak, QueryProtocol } = require('ts3-nodejs-library');
 
 const noTeamGroups = ['10', '17', '16', '15', '11']
@@ -13,6 +16,36 @@ TeamSpeak.connect({
     password: process.env.QUERY_PASSWORD,
     nickname: process.env.QUERY_NICKNAME
 }).then(async teamspeak => {
+    commandManager.registerCommand(
+        new Command(
+            ['changeBanner', 'cb'], // The Command
+            'changeBanner', // A Usage Info with arguments
+            'Shuffles the Banner Change!', // A Description what the command does
+            async (command, [...args], scope) => {
+                await changeBanner();
+                return 'Changed Banner!';
+            }
+        )
+    );
+
+    commandManager.registerCommand(
+        new Command(
+            ['info', 'i'], // The Command
+            'info', // A Usage Info with arguments
+            'Prints Informations', // A Description what the command does
+            async (command, [...args], scope) => {
+                return [...(await teamspeak.clientList({ clientType: 0 })).map(e => {
+                    console.log(e.platform, e.servergroups);
+                    return ['Name: ' + e.nickname,
+                    '  IP: ' + e.connectionClientIp,
+                    '  UID: ' + e.uniqueIdentifier,
+                    '  Country: ' + e.country,
+                    '  First Join: ' + new Date(e.created * 1000).toLocaleString()
+                    ]
+                }).flat()];
+            }
+        )
+    );
     const checkIfSelf = (cl) => {
         return !(cl.clientNickname.includes('BOT')
             || cl.clientVersion.includes('ServerQuery')
