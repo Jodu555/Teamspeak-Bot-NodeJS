@@ -59,7 +59,7 @@ TeamSpeak.connect({
     }
     const editOnlineChannels = async () => {
         const clients = await teamspeak.clientList({ clientType: 0 });
-        const teamMembers = clients.filter(c => !c.servergroups.includes(noTeamGroups));
+        const teamMembers = clients.filter(c => c.servergroups.some(g => !noTeamGroups.includes(g)));
         let channel = await teamspeak.getChannelById('33');
         let text = `[cspacer]Derzeit ${clients.length == 1 ? 'ist' : 'sind'} ${clients.length} Spieler Online`
         if (channel.name !== text)
@@ -68,7 +68,7 @@ TeamSpeak.connect({
             })
 
         channel = await teamspeak.getChannelById('34');
-        text = `[cspacer]Davon ${clients.length == 1 ? 'ist' : 'sind'} ${teamMembers.length} im Team`;
+        text = `[cspacer]Davon ${teamMembers.length == 1 ? 'ist' : 'sind'} ${teamMembers.length} im Team`;
         if (channel.name !== text)
             channel.edit({
                 channelName: text,
