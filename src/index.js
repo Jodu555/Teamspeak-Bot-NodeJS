@@ -6,6 +6,8 @@ const { TeamSpeak, QueryProtocol } = require('ts3-nodejs-library');
 
 const noTeamGroups = ['10', '17', '16', '15', '11']
 
+const wait = ms => new Promise((resolve, reject) => { setTimeout(resolve, ms) })
+
 //create a new connection
 TeamSpeak.connect({
     host: process.env.QUERY_HOST,
@@ -58,19 +60,20 @@ TeamSpeak.connect({
             || cl.clientUniqueIdentifier.includes('clientUniqueIdentifier'));
     }
     const editOnlineChannels = async () => {
+        await wait(1000 * Math.random());
         const clients = await teamspeak.clientList({ clientType: 0 });
         const teamMembers = clients.filter(c => c.servergroups.some(g => !noTeamGroups.includes(g)));
         let channel = await teamspeak.getChannelById('33');
         let text = `[cspacer]Derzeit ${clients.length == 1 ? 'ist' : 'sind'} ${clients.length} Spieler Online`
         if (channel.name !== text)
-            channel.edit({
+            await channel.edit({
                 channelName: text,
             })
 
         channel = await teamspeak.getChannelById('34');
         text = `[cspacer]Davon ${teamMembers.length == 1 ? 'ist' : 'sind'} ${teamMembers.length} im Team`;
         if (channel.name !== text)
-            channel.edit({
+            await channel.edit({
                 channelName: text,
             })
     }
