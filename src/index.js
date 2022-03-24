@@ -61,7 +61,7 @@ TeamSpeak.connect({
     }
     const editOnlineChannels = async () => {
         await wait(1000 * Math.random());
-        const clients = await teamspeak.clientList({ clientType: 0 });
+        const clients = (await teamspeak.clientList({ clientType: 0 })).filter(c => !c.servergroups.includes('11'));
         const teamMembers = clients.filter(c => c.servergroups.some(g => !noTeamGroups.includes(g)));
         let channel = await teamspeak.getChannelById('33');
         let text = `[cspacer]Derzeit ${clients.length == 1 ? 'ist' : 'sind'} ${clients.length} Spieler Online`
